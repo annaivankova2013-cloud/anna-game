@@ -6,8 +6,9 @@ import { GameScene } from './scenes/GameScene.js';
 
 // Конфігурація Supabase (заміни на свої дані після реєстрації)
 const SUPABASE_CONFIG = {
-    url: 'https://your-project.supabase.co',
-    anonKey: 'your-anon-key'
+    url: 'https://zvnaoexafvxbanxbmnjm.supabase.co',
+    anonKey: 'sb_publishable__betbVznwB3E5AjpM9gJJg_56zcmqIp
+'
 };
 
 const config = {
