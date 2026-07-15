@@ -821,4 +821,704 @@ class Game {
             graphics.fillRect(x + 35, y + 55, 30, 45);
             
             graphics.fillStyle(0xADD8E6, 1);
-            graphics.fillRect(x + 10, y + 15,
+            graphics.fillRect(x + 10, y + 15, 20, 20);
+            graphics.fillRect(x + 70, y + 15, 20, 20);
+            
+            scene.add.text(x + 50, y - 15, houseNames[i + 8], {
+                fontSize: '10px',
+                fill: '#000',
+                backgroundColor: '#ffffff88'
+            }).setOrigin(0.5);
+        }
+    }
+
+    createPlayer(scene) {
+        const x = Phaser.Math.Between(200, 600);
+        const y = Phaser.Math.Between(200, 500);
+        
+        // Створюємо спрайт гравця
+        this.player = scene.add.container(x, y);
+        
+        // Тіло
+        const body = scene.add.rectangle(0, 0, 24, 24, 
+            window.gameState.playerGender === 'girl' ? 0xFF69B4 : 0x4169E1);
+        this.player.add(body);
+        
+        // Голова
+        const head = scene.add.circle(0, -18, 10, 0xFFDBB4);
+        this.player.add(head);
+        
+        // Волосся
+        const hair = scene.add.rectangle(0, -24, 22, 8, 
+            [0x000000, 0x8B4513, 0xFFD700, 0xFF6347, 0x8B008B, 0x00CED1, 0xFF4500, 0x4B0082][window.gameState.playerAppearance.hairColor]);
+        this.player.add(hair);
+        
+        // Ім'я гравця
+        this.playerNameText = scene.add.text(0, -35, 
+            window.gameState.playerName, {
+                fontSize: '12px',
+                fill: '#000',
+                backgroundColor: '#ffffffcc',
+                padding: { x: 3, y: 1 }
+            }).setOrigin(0.5);
+        this.player.add(this.playerNameText);
+        
+        // Додаємо фізику до контейнера
+        scene.physics.world.enable(this.player);
+        this.player.body.setSize(24, 24);
+        this.player.body.setOffset(-12, -12);
+        this.player.body.setCollideWorldBounds(true);
+        
+        // Емодзі над гравцем
+        this.playerEmoji = scene.add.text(0, -45, '', {
+            fontSize: '16px'
+        }).setOrigin(0.5);
+        this.player.add(this.playerEmoji);
+    }
+
+    createNPCs(scene) {
+        this.npcs = [];
+        
+        this.npcNames.forEach((name, index) => {
+            const x = Phaser.Math.Between(100, this.mapWidth - 100);
+            const y = Phaser.Math.Between(100, this.mapHeight - 100);
+            
+            const npc = scene.add.container(x, y);
+            
+            // Тіло NPC
+            const body = scene.add.rectangle(0, 0, 22, 22, 
+                Phaser.Display.Color.GetColor(
+                    Phaser.Math.Between(100, 255),
+                    Phaser.Math.Between(100, 255),
+                    Phaser.Math.Between(100, 255)
+                ));
+            npc.add(body);
+            
+            // Голова
+            const head = scene.add.circle(0, -16, 9, 0xFFDBB4);
+            npc.add(head);
+            
+            // Ім'я
+            const nameText = scene.add.text(0, -30, name, {
+                fontSize: '10px',
+                fill: '#000',
+                backgroundColor: '#ffffffcc',
+                padding: { x: 2, y: 1 }
+            }).setOrigin(0.5);
+            npc.add(nameText);
+            
+            // Додаємо фізику
+            scene.physics.world.enable(npc);
+            npc.body.setSize(22, 22);
+            npc.body.setOffset(-11, -11);
+            npc.body.setCollideWorldBounds(true);
+            
+            // Випадковий рух
+            npc.moveDirection = new Phaser.Math.Vector2(
+                Phaser.Math.Between(-1, 1),
+                Phaser.Math.Between(-1, 1)
+            ).normalize();
+            npc.moveTimer = 0;
+            npc.speed = Phaser.Math.Between(30, 60);
+            
+            this.npcs.push(npc);
+        });
+    }
+
+    createBus(scene) {
+        // Автобус
+        this.bus = scene.add.container(100, 630);
+        
+        // Корпус автобуса
+        const busBody = scene.add.rectangle(0, 0, 60, 30, 0xFFD700);
+        this.bus.add(busBody);
+        
+        // Вікна
+        for (let i = -20; i <= 20; i += 10) {
+            const window = scene.add.rectangle(i, -5, 8, 12, 0xADD8E6);
+            this.bus.add(window);
+        }
+        
+        // Колеса
+        const wheel1 = scene.add.circle(-20, 15, 5, 0x000000);
+        const wheel2 = scene.add.circle(20, 15, 5, 0x000000);
+        this.bus.add(wheel1);
+        this.bus.add(wheel2);
+        
+        // Напис
+        const busNumber = scene.add.text(0, -20, '🚌 №3', {
+            fontSize: '10px',
+            fill: '#000'
+        }).setOrigin(0.5);
+        this.bus.add(busNumber);
+        
+        // Маршрут автобуса
+        this.busStops = [
+            { x: 100, y: 640, name: 'Житловий район' },
+            { x: 500, y: 640, name: 'Магазин' },
+            { x: 1000, y: 640, name: 'Парк' },
+            { x: 1500, y: 640, name: 'Кафе' },
+            { x: 2000, y: 640, name: 'Бібліотека' },
+            { x: 2500, y: 640, name: 'Школа' },
+            { x: 2900, y: 640, name: 'Майданчик' }
+        ];
+        
+        this.busCurrentStop = 0;
+        this.busMoving = true;
+        this.busSpeed = 80;
+        
+        // Текст над автобусом
+        this.busInfoText = scene.add.text(0, -35, '', {
+            fontSize: '10px',
+            fill: '#000',
+            backgroundColor: '#ffffff88',
+            padding: { x: 2, y: 1 }
+        }).setOrigin(0.5);
+        this.bus.add(this.busInfoText);
+        
+        scene.physics.world.enable(this.bus);
+        this.bus.body.setSize(60, 30);
+        this.bus.body.setOffset(-30, -15);
+        
+        // Зупинки на карті
+        this.busStops.forEach((stop, index) => {
+            const stopMarker = scene.add.rectangle(stop.x, stop.y, 80, 30, 0x000000, 0.3);
+            const stopText = scene.add.text(stop.x, stop.y + 20, `🚏 ${stop.name}`, {
+                fontSize: '11px',
+                fill: '#fff',
+                backgroundColor: '#00000088',
+                padding: { x: 3, y: 2 }
+            }).setOrigin(0.5);
+        });
+    }
+
+    createUI(scene) {
+        // Верхня панель
+        const topPanel = scene.add.rectangle(400, 0, 800, 60, 0x000000, 0.6);
+        topPanel.setScrollFactor(0).setDepth(100);
+        
+        // Час
+        this.timeText = scene.add.text(10, 10, '', {
+            fontSize: '16px',
+            fill: '#fff',
+            backgroundColor: '#00000088',
+            padding: { x: 8, y: 4 }
+        }).setScrollFactor(0).setDepth(101);
+        
+        // Ресурси
+        this.resourcesText = scene.add.text(200, 10, '', {
+            fontSize: '14px',
+            fill: '#fff',
+            backgroundColor: '#00000088',
+            padding: { x: 8, y: 4 }
+        }).setScrollFactor(0).setDepth(101);
+        
+        // Період дня
+        this.periodText = scene.add.text(400, 10, '', {
+            fontSize: '14px',
+            fill: '#fff',
+            backgroundColor: '#00000088',
+            padding: { x: 8, y: 4 }
+        }).setScrollFactor(0).setDepth(101);
+        
+        // Кнопка телефону
+        this.phoneButton = scene.add.text(750, 540, '📱', {
+            fontSize: '32px'
+        }).setScrollFactor(0).setDepth(101)
+          .setInteractive()
+          .on('pointerdown', () => this.openPhone(scene));
+        
+        // Міні-карта
+        this.createMinimap(scene);
+        
+        // Чат (якщо мультиплеєр)
+        if (this.networkManager) {
+            this.chatText = scene.add.text(10, 400, '', {
+                fontSize: '12px',
+                fill: '#fff',
+                backgroundColor: '#00000088',
+                padding: { x: 5, y: 3 },
+                wordWrap: { width: 300 }
+            }).setScrollFactor(0).setDepth(101);
+        }
+        
+        // Кнопка виходу
+        const exitButton = scene.add.text(750, 10, '🚪', {
+            fontSize: '24px'
+        }).setScrollFactor(0).setDepth(101)
+          .setInteractive()
+          .on('pointerdown', () => {
+              if (confirm('Вийти в головне меню?')) {
+                  this.timeSystem.stop();
+                  if (this.networkManager) {
+                      this.networkManager.connections.forEach(conn => conn.close());
+                  }
+                  this.showMainMenu();
+              }
+          });
+    }
+
+    createMinimap(scene) {
+        const minimapWidth = 150;
+        const minimapHeight = 100;
+        const minimapX = 800 - minimapWidth - 10;
+        const minimapY = 70;
+        
+        this.minimap = scene.add.graphics();
+        this.minimap.setScrollFactor(0).setDepth(101);
+        
+        // Фон міні-карти
+        this.minimap.fillStyle(0x000000, 0.7);
+        this.minimap.fillRect(minimapX, minimapY, minimapWidth, minimapHeight);
+        this.minimap.lineStyle(2, 0xFFFFFF);
+        this.minimap.strokeRect(minimapX, minimapY, minimapWidth, minimapHeight);
+        
+        // Позначки на міні-карті
+        // Дороги
+        this.minimap.fillStyle(0x555555, 0.5);
+        this.minimap.fillRect(minimapX, minimapY + (600 / this.mapHeight) * minimapHeight, 
+            minimapWidth, (80 / this.mapHeight) * minimapHeight);
+        
+        // Річка
+        this.minimap.fillStyle(0x4488ff, 0.5);
+        this.minimap.fillRect(minimapX, minimapY + (1400 / this.mapHeight) * minimapHeight,
+            minimapWidth, (100 / this.mapHeight) * minimapHeight);
+        
+        // Гравець на міні-карті
+        this.minimapPlayer = scene.add.circle(minimapX, minimapY, 3, 0xFF0000);
+        this.minimapPlayer.setScrollFactor(0).setDepth(102);
+    }
+
+    createMobileControls(scene) {
+        // Перевірка чи це мобільний пристрій
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (!isMobile) return;
+        
+        // Віртуальний джойстик
+        const joystickRadius = 45;
+        const joystickX = 70;
+        const joystickY = scene.cameras.main.height - 70;
+        
+        const joystickBase = scene.add.circle(joystickX, joystickY, 
+            joystickRadius, 0x000000, 0.4)
+            .setScrollFactor(0).setDepth(200);
+        
+        const joystickThumb = scene.add.circle(joystickX, joystickY, 
+            18, 0xFFFFFF, 0.6)
+            .setScrollFactor(0).setDepth(201)
+            .setInteractive({ draggable: true });
+        
+        // Кнопка взаємодії
+        const interactButton = scene.add.circle(
+            scene.cameras.main.width - 60,
+            scene.cameras.main.height - 60,
+            25, 0x00FF00, 0.6
+        ).setScrollFactor(0).setDepth(200)
+         .setInteractive();
+        
+        interactButton.on('pointerdown', () => {
+            this.handleInteraction(scene);
+        });
+        
+        // Логіка джойстика
+        this.joystickVector = new Phaser.Math.Vector2(0, 0);
+        
+        joystickThumb.on('drag', (pointer, dragX, dragY) => {
+            const dx = dragX - joystickX;
+            const dy = dragY - joystickY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > joystickRadius) {
+                const angle = Math.atan2(dy, dx);
+                joystickThumb.x = joystickX + Math.cos(angle) * joystickRadius;
+                joystickThumb.y = joystickY + Math.sin(angle) * joystickRadius;
+            } else {
+                joystickThumb.x = dragX;
+                joystickThumb.y = dragY;
+            }
+            
+            this.joystickVector.set(
+                (joystickThumb.x - joystickX) / joystickRadius,
+                (joystickThumb.y - joystickY) / joystickRadius
+            );
+        });
+        
+        joystickThumb.on('dragend', () => {
+            joystickThumb.x = joystickX;
+            joystickThumb.y = joystickY;
+            this.joystickVector.set(0, 0);
+        });
+        
+        // Підказка
+        scene.add.text(joystickX, joystickY - joystickRadius - 15, 
+            '🎮 Рух', {
+                fontSize: '12px',
+                fill: '#fff',
+                backgroundColor: '#00000088'
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
+        
+        scene.add.text(interactButton.x, interactButton.y - 35,
+            '🤝 Дія', {
+                fontSize: '12px',
+                fill: '#fff',
+                backgroundColor: '#00000088'
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
+    }
+
+    handleInteraction(scene) {
+        // Перевіряємо чи гравець біля дверей будинку
+        const playerX = this.player.x;
+        const playerY = this.player.y;
+        
+        // Перевірка автобусних зупинок
+        this.busStops.forEach(stop => {
+            const distance = Phaser.Math.Distance.Between(playerX, playerY, stop.x, stop.y);
+            if (distance < 60) {
+                this.boardBus(scene, stop);
+            }
+        });
+        
+        // Показуємо емодзі взаємодії
+        this.playerEmoji.setText('👋');
+        setTimeout(() => {
+            this.playerEmoji.setText('');
+        }, 1000);
+    }
+
+    boardBus(scene, stop) {
+        if (window.gameState.resources.coins < 3) {
+            this.showMessage(scene, 'Недостатньо монет для проїзду! 💰');
+            return;
+        }
+        
+        window.gameState.resources.coins -= 3;
+        window.gameState.busPassengers.push(window.gameState.playerName);
+        
+        this.showMessage(scene, `Ви сіли в автобус на зупинці "${stop.name}"! 🚌`);
+        
+        // Телепортуємо гравця в автобус
+        this.player.x = this.bus.x + Phaser.Math.Between(-20, 20);
+        this.player.y = this.bus.y;
+    }
+
+    showMessage(scene, message) {
+        const msg = scene.add.text(400, 300, message, {
+            fontSize: '18px',
+            fill: '#fff',
+            backgroundColor: '#000000cc',
+            padding: { x: 15, y: 10 }
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(300);
+        
+        scene.tweens.add({
+            targets: msg,
+            y: 250,
+            alpha: 0,
+            duration: 2000,
+            onComplete: () => msg.destroy()
+        });
+    }
+
+    openPhone(scene) {
+        this.playerEmoji.setText('📱');
+        
+        // Створюємо меню телефону
+        const phoneBg = scene.add.rectangle(400, 300, 300, 400, 0x000000, 0.9)
+            .setScrollFactor(0).setDepth(500).setInteractive();
+        
+        const phoneTitle = scene.add.text(400, 150, '📱 Телефон', {
+            fontSize: '24px',
+            fill: '#fff'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(501);
+        
+        const apps = [
+            { icon: '💬', text: 'Чат', y: 200 },
+            { icon: '🐍', text: 'Змійка', y: 240 },
+            { icon: '📒', text: 'Щоденник', y: 280 },
+            { icon: '💳', text: 'Баланс', y: 320 },
+            { icon: '📝', text: 'Справи', y: 360 },
+            { icon: '😴', text: 'Спати', y: 400 },
+            { icon: '👤', text: 'Профіль', y: 440 }
+        ];
+        
+        const phoneElements = [phoneBg, phoneTitle];
+        
+        apps.forEach(app => {
+            const appText = scene.add.text(400, app.y, `${app.icon} ${app.text}`, {
+                fontSize: '18px',
+                fill: '#fff',
+                backgroundColor: '#333333',
+                padding: { x: 10, y: 5 }
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(501)
+              .setInteractive();
+            
+            appText.on('pointerdown', () => {
+                if (app.text === 'Спати') {
+                    this.timeSystem.skipToMorning();
+                    this.showMessage(scene, '😴 Ви проспали до ранку! Енергія відновлена.');
+                    phoneElements.forEach(el => el.destroy());
+                } else if (app.text === 'Профіль') {
+                    this.showMessage(scene, 
+                        `👤 ${window.gameState.playerName}\n💰 Монет: ${window.gameState.resources.coins}\n💳 Картка: ${window.gameState.resources.cardBalance}\n⚡ Енергія: ${window.gameState.resources.energy}%`);
+                } else if (app.text === 'Баланс') {
+                    const amount = prompt('Сума для поповнення картки:');
+                    if (amount && !isNaN(amount)) {
+                        window.gameState.resources.cardBalance += parseInt(amount);
+                        this.showMessage(scene, `💳 Картку поповнено на ${amount}!`);
+                    }
+                }
+            });
+            
+            phoneElements.push(appText);
+        });
+        
+        // Кнопка закриття
+        const closeButton = scene.add.text(400, 480, '❌ Закрити', {
+            fontSize: '20px',
+            fill: '#ff4444',
+            backgroundColor: '#333333',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(501)
+          .setInteractive()
+          .on('pointerdown', () => {
+              phoneElements.forEach(el => el.destroy());
+              this.playerEmoji.setText('');
+          });
+        
+        phoneElements.push(closeButton);
+    }
+
+    updateGame(scene, time, delta) {
+        if (!this.gameStarted) return;
+        
+        // Рух гравця
+        this.handleMovement();
+        
+        // Рух NPC
+        this.updateNPCs(scene, delta);
+        
+        // Рух автобуса
+        this.updateBus(scene, delta);
+        
+        // Оновлення UI
+        this.updateUI(scene);
+        
+        // Оновлення міні-карти
+        this.updateMinimap();
+        
+        // Синхронізація позиції
+        if (this.networkManager && time - this.lastSyncTime > 100) {
+            this.networkManager.sendPlayerMove(this.player.x, this.player.y);
+            this.lastSyncTime = time;
+        }
+        
+        // Синхронізація часу (хост)
+        if (this.networkManager?.isHost && Math.random() < 0.1) {
+            this.networkManager.syncGameTime();
+        }
+        
+        // Синхронізація автобуса (хост)
+        if (this.networkManager?.isHost && Math.random() < 0.05) {
+            this.networkManager.syncBusPosition();
+        }
+    }
+
+    handleMovement() {
+        if (!this.player?.body) return;
+        
+        let vx = 0;
+        let vy = 0;
+        
+        // Клавіатура
+        if (this.cursors?.left.isDown || this.wasd?.left.isDown) vx = -1;
+        if (this.cursors?.right.isDown || this.wasd?.right.isDown) vx = 1;
+        if (this.cursors?.up.isDown || this.wasd?.up.isDown) vy = -1;
+        if (this.cursors?.down.isDown || this.wasd?.down.isDown) vy = 1;
+        
+        // Джойстик
+        if (this.joystickVector) {
+            vx = this.joystickVector.x;
+            vy = this.joystickVector.y;
+        }
+        
+        // Нормалізація діагонального руху
+        if (vx !== 0 && vy !== 0) {
+            const length = Math.sqrt(vx * vx + vy * vy);
+            vx /= length;
+            vy /= length;
+        }
+        
+        this.player.body.setVelocity(vx * this.playerSpeed, vy * this.playerSpeed);
+        
+        // Анімація напрямку
+        if (vx !== 0 || vy !== 0) {
+            this.playerEmoji.setText(vx > 0 ? '➡️' : vx < 0 ? '⬅️' : vy > 0 ? '⬇️' : '⬆️');
+        } else {
+            this.playerEmoji.setText('');
+        }
+    }
+
+    updateNPCs(scene, delta) {
+        this.npcs.forEach(npc => {
+            if (!npc.body) return;
+            
+            npc.moveTimer -= delta;
+            
+            if (npc.moveTimer <= 0) {
+                // Змінюємо напрямок
+                npc.moveDirection = new Phaser.Math.Vector2(
+                    Phaser.Math.Between(-1, 1),
+                    Phaser.Math.Between(-1, 1)
+                ).normalize();
+                npc.moveTimer = Phaser.Math.Between(1000, 3000);
+            }
+            
+            npc.body.setVelocity(
+                npc.moveDirection.x * npc.speed,
+                npc.moveDirection.y * npc.speed
+            );
+        });
+    }
+
+    updateBus(scene, delta) {
+        if (!this.bus || !this.busStops || this.busStops.length === 0) return;
+        
+        const targetStop = this.busStops[this.busCurrentStop];
+        const dx = targetStop.x - this.bus.x;
+        const dy = targetStop.y - this.bus.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 5) {
+            // Прибули на зупинку
+            this.busInfoText.setText(`🚏 ${targetStop.name}`);
+            
+            // Чекаємо трохи на зупинці
+            if (!this.busWaitTimer) {
+                this.busWaitTimer = 0;
+            }
+            
+            this.busWaitTimer += delta;
+            
+            if (this.busWaitTimer > 3000) { // 3 секунди очікування
+                this.busCurrentStop = (this.busCurrentStop + 1) % this.busStops.length;
+                this.busWaitTimer = 0;
+                this.busInfoText.setText('🚌 В дорозі...');
+            }
+        } else {
+            // Рухаємось до наступної зупинки
+            const angle = Math.atan2(dy, dx);
+            this.bus.body.setVelocity(
+                Math.cos(angle) * this.busSpeed,
+                Math.sin(angle) * this.busSpeed
+            );
+            this.busInfoText.setText('🚌 В дорозі...');
+            
+            // Оновлюємо позицію пасажирів
+            window.gameState.busPassengers.forEach(passengerName => {
+                if (passengerName === window.gameState.playerName) {
+                    this.player.x = this.bus.x + Phaser.Math.Between(-20, 20);
+                    this.player.y = this.bus.y;
+                }
+            });
+        }
+        
+        // Оновлюємо глобальну позицію автобуса
+        window.gameState.busPosition = {
+            x: this.bus.x,
+            y: this.bus.y,
+            currentStop: this.busCurrentStop
+        };
+    }
+
+    updateUI(scene) {
+        // Час
+        if (this.timeText) {
+            this.timeText.setText(`🕐 ${this.timeSystem.getTimeString()}`);
+        }
+        
+        // Ресурси
+        if (this.resourcesText) {
+            const res = window.gameState.resources;
+            this.resourcesText.setText(`💰 ${res.coins} | 💳 ${res.cardBalance} | ⚡ ${res.energy}%`);
+        }
+        
+        // Період дня
+        if (this.periodText) {
+            this.periodText.setText(this.timeSystem.getCurrentPeriod());
+        }
+        
+        // Нічний ефект
+        if (this.timeSystem.isNight && !this.nightOverlay) {
+            this.nightOverlay = scene.add.rectangle(
+                400, 300, 800, 600, 0x000033, 0.4
+            ).setScrollFactor(0).setDepth(99);
+        } else if (!this.timeSystem.isNight && this.nightOverlay) {
+            this.nightOverlay.destroy();
+            this.nightOverlay = null;
+        }
+    }
+
+    updateMinimap() {
+        if (!this.minimapPlayer || !this.player) return;
+        
+        const minimapWidth = 150;
+        const minimapHeight = 100;
+        const minimapX = 800 - minimapWidth - 10;
+        const minimapY = 70;
+        
+        const scaleX = minimapWidth / this.mapWidth;
+        const scaleY = minimapHeight / this.mapHeight;
+        
+        this.minimapPlayer.setPosition(
+            minimapX + this.player.x * scaleX,
+            minimapY + this.player.y * scaleY
+        );
+    }
+
+    startMultiplayerSync() {
+        // Періодична синхронізація часу
+        if (this.networkManager.isHost) {
+            setInterval(() => {
+                this.networkManager.syncGameTime();
+            }, 5000);
+            
+            setInterval(() => {
+                this.networkManager.syncBusPosition();
+            }, 3000);
+        }
+    }
+}
+
+// ============================================
+// ЗАПУСК ГРИ
+// ============================================
+window.addEventListener('load', () => {
+    console.log('🚀 Запуск гри "Літо і Дитинство"...');
+    
+    try {
+        const game = new Game();
+        game.init();
+        
+        // Зберігаємо посилання на гру для доступу з інших частин коду
+        window.game = game;
+        
+        console.log('✅ Гра успішно запущена!');
+    } catch (error) {
+        console.error('❌ Помилка запуску гри:', error);
+        
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.innerHTML = `
+                <h1>😢 Помилка запуску</h1>
+                <p>${error.message}</p>
+                <p>Спробуйте оновити сторінку</p>
+            `;
+        }
+    }
+});
+
+// Обробка помилок
+window.addEventListener('error', (event) => {
+    console.error('Глобальна помилка:', event.error);
+});
+
+console.log('📦 Код гри завантажено успішно!');
