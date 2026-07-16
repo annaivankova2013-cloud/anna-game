@@ -2,22 +2,27 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>☀️ Літо і Дитинство</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: Arial, sans-serif; color: white; }
+        body { background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-family: Arial, sans-serif; color: white; }
         #game-container { width: 800px; height: 600px; position: relative; }
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; font-size: 20px; }
+        #loading, #loading-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; font-size: 20px; z-index: 1000; }
+        #error, #error-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ff4444; text-align: center; z-index: 2000; display: none; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; }
     </style>
-    <!-- Прямі та стабільні лінки без блокувань -->
+    <!-- Стабільні лінки з cdnjs -->
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
 </head>
 <body>
     <div id="game-container">
+        <!-- Створюємо блоки з усіма варіантами ID для main.js -->
         <div id="loading">🎮 Завантаження міста та синхронізація...</div>
+        <div id="loading-screen">🎮 Завантаження міста та синхронізація...</div>
+        <div id="error"></div>
+        <div id="error-message"></div>
     </div>
     <script src="js/main.js"></script>
 </body>
