@@ -1,137 +1,161 @@
-// Створюємо гру тільки після повного завантаження сторінки
-window.onload = function() {
+// Чекаємо повного завантаження ВСІХ бібліотек
+window.addEventListener('load', function() {
     
-    // Ігровий клас
-    class SummerGame extends Phaser.Scene {
+    console.log('📦 Сторінка завантажена');
+    console.log('Phaser:', typeof Phaser !== 'undefined' ? '✅' : '❌');
+    console.log('PeerJS:', typeof Peer !== 'undefined' ? '✅' : '❌');
+    console.log('Supabase:', typeof supabase !== 'undefined' ? '✅' : '❌');
+    
+    // Ховаємо напис завантаження
+    document.getElementById('loading').style.display = 'none';
+    
+    // Перевірка Phaser
+    if (typeof Phaser === 'undefined') {
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'Помилка: Phaser не завантажився. Перевірте інтернет.';
+        return;
+    }
+    
+    // Створюємо просту сцену
+    class GameScene extends Phaser.Scene {
         constructor() {
-            super('SummerGame');
+            super('GameScene');
             this.player = null;
-            this.cursors = null;
-        }
-        
-        preload() {
-            // Створюємо текстури програмно
-            this.createTextures();
-        }
-        
-        createTextures() {
-            // Текстура гравця
-            var playerGraphics = this.make.graphics({ add: false });
-            playerGraphics.fillStyle(0xFFD700, 1);
-            playerGraphics.fillRect(0, 0, 32, 32);
-            playerGraphics.generateTexture('player', 32, 32);
-            playerGraphics.destroy();
         }
         
         create() {
-            var self = this;
+            const { width, height } = this.cameras.main;
             
-            // Встановлюємо фон
+            // Фон
             this.cameras.main.setBackgroundColor('#87CEEB');
             
             // Малюємо світ
-            var graphics = this.add.graphics();
+            const g = this.add.graphics();
             
             // Трава
-            graphics.fillStyle(0x4CAF50, 1);
-            graphics.fillRect(0, 0, 3200, 2200);
+            g.fillStyle(0x4CAF50);
+            g.fillRect(0, 100, 3200, 2100);
             
-            // Дорога
-            graphics.fillStyle(0x666666, 1);
-            graphics.fillRect(0, 300, 3200, 60);
+            // Дороги
+            g.fillStyle(0x666666);
+            g.fillRect(0, 300, 3200, 70);
+            g.fillRect(800, 0, 70, 2200);
             
-            // Розмітка на дорозі
-            graphics.fillStyle(0xFFFFFF, 1);
-            for (var i = 0; i < 3200; i += 40) {
-                graphics.fillRect(i, 328, 20, 4);
-            }
-            
-            // Будинки
-            var colors = [0xFF6347, 0x87CEEB, 0x98FB98, 0xFFD700, 0xFF69B4];
-            for (var i = 0; i < 5; i++) {
-                var x = 100 + i * 200;
-                graphics.fillStyle(colors[i], 1);
-                graphics.fillRect(x, 180, 100, 80);
-                graphics.fillStyle(0x654321, 1);
-                graphics.fillRect(x + 35, 220, 30, 40);
-                graphics.fillStyle(0xADD8E6, 1);
-                graphics.fillRect(x + 10, 195, 20, 20);
-                graphics.fillRect(x + 70, 195, 20, 20);
-            }
-            
-            // Дерева
-            for (var i = 0; i < 50; i++) {
-                var treeX = Phaser.Math.Between(50, 3150);
-                var treeY = Phaser.Math.Between(100, 2100);
-                
-                graphics.fillStyle(0x795548, 1);
-                graphics.fillRect(treeX - 5, treeY, 10, 30);
-                graphics.fillStyle(0x228B22, 1);
-                graphics.fillCircle(treeX, treeY - 10, 15);
+            // Розмітка
+            g.fillStyle(0xFFFFFF);
+            for (let i = 0; i < 3200; i += 40) {
+                g.fillRect(i, 333, 20, 4);
             }
             
             // Річка
-            graphics.fillStyle(0x4488FF, 0.7);
-            graphics.fillRect(0, 500, 3200, 60);
+            g.fillStyle(0x4488FF, 0.7);
+            g.fillRect(0, 500, 3200, 60);
             
-            // Створюємо гравця
+            // Міст
+            g.fillStyle(0x8B4513);
+            g.fillRect(400, 490, 100, 80);
+            
+            // Будинки
+            const colors = [0xFF6347, 0x87CEEB, 0x98FB98, 0xFFD700, 0xFF69B4, 0xDDA0DD, 0xF0E68C, 0xFFA07A];
+            for (let i = 0; i < 8; i++) {
+                const x = 50 + i * 100;
+                g.fillStyle(colors[i]);
+                g.fillRect(x, 180, 80, 70);
+                g.fillStyle(0x654321);
+                g.fillRect(x + 25, 210, 30, 40);
+                g.fillStyle(0xADD8E6);
+                g.fillRect(x + 10, 190, 15, 15);
+                g.fillRect(x + 55, 190, 15, 15);
+            }
+            
+            // Дерева
+            for (let i = 0; i < 100; i++) {
+                const x = Phaser.Math.Between(50, 3150);
+                const y = Phaser.Math.Between(120, 2150);
+                g.fillStyle(0x795548);
+                g.fillRect(x - 4, y, 8, 25);
+                g.fillStyle(0x228B22);
+                g.fillCircle(x, y - 8, 12);
+            }
+            
+            // Створюємо гравця (простий спрайт)
+            const playerGraphics = this.make.graphics({ add: false });
+            playerGraphics.fillStyle(0xFFD700);
+            playerGraphics.fillRect(0, 0, 32, 32);
+            playerGraphics.generateTexture('player', 32, 32);
+            playerGraphics.destroy();
+            
             this.player = this.physics.add.sprite(400, 250, 'player');
             this.player.setCollideWorldBounds(true);
             
-            // Камера
+            // Камера слідує за гравцем
             this.cameras.main.setBounds(0, 0, 3200, 2200);
             this.cameras.main.startFollow(this.player);
             
             // Управління
             this.cursors = this.input.keyboard.createCursorKeys();
+            this.wasd = {
+                up: this.input.keyboard.addKey('W'),
+                down: this.input.keyboard.addKey('S'),
+                left: this.input.keyboard.addKey('A'),
+                right: this.input.keyboard.addKey('D')
+            };
             
-            // UI текст
-            var uiText = this.add.text(400, 20, '☀️ ЛІТО І ДИТИНСТВО', {
-                fontSize: '20px',
+            // UI
+            this.add.text(10, 10, '☀️ Літо і Дитинство', {
+                fontSize: '18px',
                 fill: '#FFFFFF',
                 backgroundColor: '#00000088',
                 padding: { x: 10, y: 5 }
-            }).setOrigin(0.5).setScrollFactor(0);
+            }).setScrollFactor(0).setDepth(100);
             
-            var controls = this.add.text(400, 560, 'Використовуйте СТРІЛКИ для руху', {
+            this.add.text(10, 560, 'WASD/Стрілки - рух | E - телефон', {
                 fontSize: '14px',
                 fill: '#FFFFFF',
                 backgroundColor: '#00000088',
                 padding: { x: 10, y: 5 }
-            }).setOrigin(0.5).setScrollFactor(0);
+            }).setScrollFactor(0).setDepth(100);
             
-            console.log('✅ Гра успішно запущена!');
+            // Кнопка телефону
+            const phone = this.add.text(750, 540, '📱', {
+                fontSize: '32px'
+            }).setScrollFactor(0).setDepth(100).setInteractive();
+            
+            phone.on('pointerdown', () => {
+                alert('📱 Телефон\n\nМонети: 💰 15\nКартка: 💳 50\nЕнергія: ⚡ 100%');
+            });
+            
+            // Клавіша E
+            this.input.keyboard.addKey('E').on('down', () => {
+                alert('🔔 Взаємодія!\nВи натиснули клавішу E');
+            });
+            
+            console.log('✅ Гра запущена успішно!');
         }
         
         update() {
-            if (!this.player || !this.cursors) return;
+            if (!this.player) return;
             
-            var speed = 200;
+            const speed = 200;
+            let vx = 0;
+            let vy = 0;
             
-            if (this.cursors.left.isDown) {
-                this.player.setVelocityX(-speed);
-            } else if (this.cursors.right.isDown) {
-                this.player.setVelocityX(speed);
-            } else {
-                this.player.setVelocityX(0);
-            }
+            if (this.cursors?.left.isDown || this.wasd?.left.isDown) vx = -1;
+            if (this.cursors?.right.isDown || this.wasd?.right.isDown) vx = 1;
+            if (this.cursors?.up.isDown || this.wasd?.up.isDown) vy = -1;
+            if (this.cursors?.down.isDown || this.wasd?.down.isDown) vy = 1;
             
-            if (this.cursors.up.isDown) {
-                this.player.setVelocityY(-speed);
-            } else if (this.cursors.down.isDown) {
-                this.player.setVelocityY(speed);
-            } else {
-                this.player.setVelocityY(0);
-            }
+            this.player.setVelocity(vx * speed, vy * speed);
         }
     }
     
-    // Конфігурація гри
-    var config = {
+    // Конфігурація
+    const config = {
         type: Phaser.AUTO,
         width: 800,
         height: 600,
         parent: 'game-container',
+        backgroundColor: '#87CEEB',
         physics: {
             default: 'arcade',
             arcade: {
@@ -139,19 +163,10 @@ window.onload = function() {
                 debug: false
             }
         },
-        scene: SummerGame
+        scene: GameScene
     };
     
-    // Запускаємо гру
-    try {
-        var game = new Phaser.Game(config);
-        console.log('🎮 Phaser гру створено');
-    } catch (error) {
-        console.error('❌ Помилка:', error);
-        document.body.innerHTML = '<div style="color:white;text-align:center;padding:50px;">' +
-            '<h1>Помилка запуску гри</h1>' +
-            '<p>' + error.message + '</p>' +
-            '<p>Перевірте консоль браузера (F12)</p>' +
-            '</div>';
-    }
-};
+    // Запуск
+    const game = new Phaser.Game(config);
+    console.log('🎮 Гра створена!');
+});
