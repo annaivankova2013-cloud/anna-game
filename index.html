@@ -2,26 +2,104 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>☀️ Літо і Дитинство</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>☀️ Літо і Дитинство - Мультиплеєрний симулятор міста</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: Arial, sans-serif; color: white; }
-        #game-container { width: 800px; height: 600px; position: relative; }
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1000; font-size: 20px; }
-        #error { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ff4444; text-align: center; z-index: 1000; font-size: 18px; display: none; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 4/3;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #loading h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff4444;
+            text-align: center;
+            z-index: 2000;
+            display: none;
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ff4444;
+        }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <div id="loading">🎮 Завантаження гри... Перевірка бібліотек...</div>
+        <div id="loading">
+            <h1>☀️ Літо і Дитинство</h1>
+            <div class="spinner"></div>
+            <p>Завантаження гри та перевірка систем...</p>
+        </div>
         <div id="error"></div>
     </div>
     
-    <!-- Стабільні та відкриті джерела бібліотек -->
+    <!-- Подключение стабильных библиотек из надёжного источника cdnjs -->
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
+    
+    <!-- Твой главный файл игры -->
     <script src="js/main.js"></script>
 </body>
 </html>
