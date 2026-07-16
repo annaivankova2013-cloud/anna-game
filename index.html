@@ -32,7 +32,6 @@
             display: block;
         }
 
-        /* Екран завантаження */
         #loading-screen {
             position: absolute;
             top: 0;
@@ -69,7 +68,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Сповіщення про помилку */
         .error-message {
             position: absolute;
             top: 50%;
@@ -96,11 +94,8 @@
         }
     </style>
     
-    <!-- Phaser.js -->
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <!-- PeerJS для P2P з'єднань -->
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -108,7 +103,7 @@
         <div id="loading-screen">
             <h1>☀️ Літо і Дитинство</h1>
             <div class="spinner"></div>
-            <p>Завантаження гри...</p>
+            <p id="loading-text">Завантаження гри...</p>
         </div>
         <div class="error-message" id="error-message"></div>
     </div>
