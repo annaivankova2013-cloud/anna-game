@@ -5,58 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>☀️ Літо і Дитинство</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-        }
-        #game-container {
-            width: 800px;
-            height: 600px;
-            position: relative;
-        }
-        #loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            text-align: center;
-            z-index: 1000;
-            font-size: 20px;
-        }
-        #error {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff4444;
-            text-align: center;
-            z-index: 1000;
-            font-size: 18px;
-            display: none;
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
-            border-radius: 10px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: Arial, sans-serif; color: white; }
+        #game-container { width: 800px; height: 600px; position: relative; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 1000; font-size: 20px; }
+        #error { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ff4444; text-align: center; z-index: 1000; font-size: 18px; display: none; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <div id="loading">🎮 Завантаження гри...</div>
+        <div id="loading">🎮 Завантаження гри... Перевірка бібліотек...</div>
         <div id="error"></div>
     </div>
     
-    <!-- Завантажуємо бібліотеки в правильному порядку -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- Стабільні та відкриті джерела бібліотек -->
+    <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
     <script src="js/main.js"></script>
