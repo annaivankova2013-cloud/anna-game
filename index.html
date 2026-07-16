@@ -2,112 +2,27 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>☀️ Літо і Дитинство - Мультиплеєрний симулятор міста</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Літо і Дитинство</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
             background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
         #game-container {
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 4/3;
-            position: relative;
-        }
-
-        canvas {
-            display: block;
-        }
-
-        #loading-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 1000;
-        }
-
-        #loading-screen h1 {
-            font-size: 2em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #ff4444;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            z-index: 2000;
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            #game-container {
-                max-width: 100%;
-                height: 100vh;
-            }
-            
-            #loading-screen h1 {
-                font-size: 1.5em;
-            }
+            width: 800px;
+            height: 600px;
         }
     </style>
-    
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div id="game-container">
-        <div id="loading-screen">
-            <h1>☀️ Літо і Дитинство</h1>
-            <div class="spinner"></div>
-            <p id="loading-text">Завантаження гри...</p>
-        </div>
-        <div class="error-message" id="error-message"></div>
-    </div>
-    
+    <div id="game-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
