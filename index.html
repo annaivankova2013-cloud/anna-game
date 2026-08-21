@@ -9,7 +9,73 @@
         body { background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-family: Arial, sans-serif; color: white; }
         #game-container { width: 800px; height: 600px; position: relative; }
         #loading, #loading-screen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; font-size: 20px; z-index: 1000; }
-        #error, #error-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ff4444; text-align: center; z-index: 2000; display: none; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; }
+        #error, #error-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ff4444; text-align: center; z-index: 2000; display: none; background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .navbar-logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .navbar-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .navbar-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .navbar-link.promo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: pulse 2s infinite;
+        }
+        
+        .navbar-link.promo:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .navbar-link.admin {
+            background: rgba(255, 107, 107, 0.3);
+        }
+        
+        .navbar-link.admin:hover {
+            background: rgba(255, 107, 107, 0.5);
+        }
+        
+        #game-container {
+            margin-top: 60px;
+        }
     </style>
     <!-- Стабільні лінки з cdnjs -->
     <script src="https://cloudflare.com"></script>
@@ -17,6 +83,16 @@
     <script src="https://cloudflare.com"></script>
 </head>
 <body>
+    <!-- Навігаційна панель -->
+    <div class="navbar">
+        <div class="navbar-logo">☀️ Літо і Дитинство</div>
+        <div class="navbar-menu">
+            <a href="promos.html" class="navbar-link promo">🎁 Промокоди & Акції</a>
+            <a href="admin.html" class="navbar-link admin">🔐 Адмін</a>
+            <a href="#" class="navbar-link" onclick="toggleSettings()">⚙️ Налаштування</a>
+        </div>
+    </div>
+
     <div id="game-container">
         <!-- Створюємо блоки з усіма варіантами ID для main.js -->
         <div id="loading">🎮 Завантаження міста та синхронізація...</div>
@@ -24,6 +100,18 @@
         <div id="error"></div>
         <div id="error-message"></div>
     </div>
- <script src="js/main.js" defer></script>
+    
+    <script src="js/main.js" defer></script>
+    <script>
+        function toggleSettings() {
+            alert('⚙️ НАЛАШТУВАННЯ ГРАВЦЯ\n\n' +
+                  '🔊 Звук: Увімкнено\n' +
+                  '🎨 Якість графіки: Висока\n' +
+                  '💾 Розмір збережень: 125 MB\n' +
+                  '👤 Ім\'я гравця: Змініти\n' +
+                  '🌐 Мова: Українська\n\n' +
+                  'Натисніть на будь-яку опцію для зміни налаштувань');
+        }
+    </script>
 </body>
 </html>
